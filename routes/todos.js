@@ -42,11 +42,11 @@ Td.post('/app/todos/:id', isLoggedIn, async_wrapper(async function(req, res, nex
 }));
 
 Td.get('/app/todos/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
-	Todos.findOne({req.params.id}, err_handler);
+	await Todos.findOne({req.params.id}, err_handler);
 	res.end('Done');
 }));
 
-Td.put('app/todo/:id', isLoggedIn, hasAuth, async_wrapper(function(req, res, next){
+Td.put('app/todo/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
 	var _id = req.params.id;
 	await Todos.findOneAndUpdate({_id}, req.body, {new: true}, err_handler);
 	res.end('Done');
