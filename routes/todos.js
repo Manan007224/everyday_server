@@ -31,7 +31,8 @@ function hasAuth(req, res, next) {
 }
 
 Td.get('/app/todos', isLoggedIn, async_wrapper(async function(req, res, next){
-	await Todos.find({}, err_handler);
+	const todos = await Todos.find({}, err_handler);
+	res.status(200).json(todos);
 	res.end('Done');
 }));
 
@@ -42,13 +43,15 @@ Td.post('/app/todos/:id', isLoggedIn, async_wrapper(async function(req, res, nex
 }));
 
 Td.get('/app/todos/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
-	await Todos.findOne({req.params.id}, err_handler);
+	const todo = await Todos.findOne({req.params.id}, err_handler);
+	res.status(200).json(todo);
 	res.end('Done');
 }));
 
 Td.put('app/todo/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
 	var _id = req.params.id;
-	await Todos.findOneAndUpdate({_id}, req.body, {new: true}, err_handler);
+	const todo_r = await Todos.findOneAndUpdate({_id}, req.body, {new: true}, err_handler);
+	res.status(200).json(todo_r);
 	res.end('Done');
 }));
 
