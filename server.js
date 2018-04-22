@@ -27,68 +27,6 @@ mongoose.connect('mongodb://127.0.0.1/todo_schema', function(err){
 // 	get, post, delete and put
 // 	there are two variations of get where we can get either all the routes or just one route
 
-app.post('/', function(req, res){
-	const Td = new Todos(req.body);
-	Td.save(function(err, td){
-		if(err) {
-			res.status(400).json(err);
-		}
-		else {
-			res.json(td);
-		}
-	});
-});
-
-app.get('/:id', function(req, res){
-
-	const _id = req.params.id;
-	Todos.findOne({_id}, function(err, td){
-		if(err) {
-			res.status(400).json(err);
-		}
-		if(!td) {
-			res.status(404).json({ message: 'task not found.' });
-		}
-		res.json(td);
-	});
-});
-
-app.get('/', function(req, res){
-
-	Todos.find({}, function(err, tds){
-		if(err) {
-			res.status(400).json(err);
-		}
-		res.json(tds);
-		console.log(res);
-	});
-});
-
-
-app.put('/:id', function(req, res){
-
-	const _id = req.params.id;
-	Todos.findOneAndUpdate({_id}, req.body, {new:true}, function(err, contact){
-		if(err) {
-			res.status(400).json(err);
-		}
-		res.json(td);
-	});
-});
-
-app.get('/:id', function(req, res){
-
-	const _id = req.params.id;
-	Todos.findOneAndRemove({_id}, function(err, td){
-		if(err) {
-			res.status(400).json(err);
-		}
-		if(!td) {
-			res.status(404).json({ message: 'Task not found.' });
-		}
-		res.json({ message: `task ${td._id} deleted.` });
-	});
-});
 
 const hostname = 'localhost';
 const port = 8000;

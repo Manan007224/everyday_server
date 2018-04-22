@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Todos = require('../models/todo');
-
+const {err_handler, async_wrapper} = require('/../helpers/helpers');
 const Td = express.Router();
 
 // Add the middle-ware function for the route
@@ -30,68 +30,29 @@ function hasAuth(req, res, next) {
 	}
 }
 
-Td.get('/app/todos', isLoggedIn, function(req, res){
-	const _id = req.params.user._id;
-	Todos.find({create: _id}, function(err, todos){
-		if(err)
-			res.status(400).json(err);
-		res.json(todos);
-	});
-});
+Td.get('/app/todos', isLoggedIn, async_wrapper(async function(req, res, next){
+	await Todos.find({}, err_handler);
+	res.end('Done');
+}));
 
-Td.post('/app/todos/:id', isLoggedIn, function(req, res){
-	var td = new Todos(req.body);
-	todo.creator = req.params.user;
-	td.save(function(err, tod){
-		if(err)
-			res.status(400).json(err);
-		else
-			res.json(tod);
-	});
-});
+Td.post('/app/todos/:id', isLoggedIn, async_wrapper(async function(req, res, next){
+	var td = {task: req.body.task, isCompleted: req.body.isCompleted, creator: req.user};
+	await td.save(err_handler);
+	res.end('Done');
+}));
 
-Td.get('/app/todos/:id', isLoggedIn, hasAuth, function(req, res){
+Td.get('/app/todos/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
+	Todos.findOne({req.params.id}, err_handler);
+	res.end('Done');
+}));
 
-	const _id = rq.params.id;
-	Todos.findOne({_id}, function(err, td){
-		if(err)
-			res.status(400).json(err);
-		else 
-			res.json(td);
-	});
-});
-
-Td.route('app/todo/:id'), isLoggedIn, hasAuth, function(req, res){
-	const temp_todo;
+Td.put('app/todo/:id', isLoggedIn, hasAuth, async_wrapper(function(req, res, next){
 	var _id = req.params.id;
-	Todos.findOne({_id}, function(err, td){
-		if(err)
-			res.status(400),json(err);
-		else
-			temp_todo = td;
-	});
-	temp_todo.task = req.body.task;
-	temp_todo.isCompleted = req.body.isCompleted;
-	temp_todo.save(function(err, td){
-		if(err)
-			res.status(400).json(err);
-	});
+	await Todos.findOneAndUpdate({_id}, req.body, {new: true}, err_handler);
+	res.end('Done');
+}));
 
-	Todos.findOneAndRemove({_id}, function(err, td){
-		if(err)
-			res.status(400).json(err);
-		else
-			res.json(td);
-	});
-});
-
-Td.delete('app/todo/:id', isLoggedIn, hasAuth, function(req, res){
-	Todos.findOneAndRemove({req.params.id}, function(req, res){
-		if(err)
-			res.status(400).json(err);
-		if(!td)
-			res.status(404).json({ message: 'Task not found.' });
-		else 
-			res.json({ message: `task ${td._id} deleted.` });
-	});
-});
+Td.delete('app/todo/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
+	await Todos.findOneAndRemove({req.params.id}, err_handler);
+	res.end('Done');
+}));
