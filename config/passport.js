@@ -24,15 +24,21 @@ module.exports = function(passport) {
 
 			User.findOne({'email': email}, function(err, user){
 				if(err) {
+					console.log("1" + err);
 					return done(err);
 				}
 				if(user) {
-					return done(null, false, {message: 'The user with this email already exists'});
+					console.log("user already exists" + (err));
+					console.log(user);
+					return done(null);
 				}
 				else {
-					new_user = {email: email, password: pwd}
+					var new_user = new User();
+					new_user.email = email;
+					new_user.password = new_user.generateHash(pwd);
 					new_user.save(function(err) {
 						if(err) throw err;
+						console.log(new_user);
 						return done(null, new_user);
 					});
 				}
@@ -51,14 +57,18 @@ module.exports = function(passport) {
 		function(req, email, pwd, done) {
 			User.findOne({'email': email}, function(err, user){
 				if(err) {
+					console.log(err);
 					return done(err);
 				}
 				if(!user) {
+					console.log('incorrect passowrd');
 					return done(null, false, {message: 'The user doesnt exist'});
 				}
 				if(!user.validPassword(pwd)) {
+					console.log('correct passowrd');
 					return done(null, false, {message: 'wrong password added'});
 				}
+				console.log('welcome finally');
 				return done(null, user);
 			});
 		}

@@ -6,18 +6,23 @@ const {err_handler, async_wrapper} = require('../helpers/helpers');
 const usr = express.Router();
 
 
-usr.get('/signup', async_wrapper(async function(req, res, next){
-	res.end('GET/Users');
-}));
+usr.get('/signup', function(req, res){
+	
+	res.send('GET/SINGUP');
+});
 
 usr.post('/signup', passport.authenticate('local-signup', {
-	successRedirect : '/todos',
-	failureRedirect : '/signup'
+		successRedirect : '/todos', // redirect to the secure profile section
+		failureRedirect : '/signup'
 }));
 
-usr.get('/login', async_wrapper(async function(req, res, next){
-	res.end('GET/login');
-}));
+
+
+usr.get('/login', function(req, res){
+	
+	res.send('GET/SINGUP');
+});
+
 
 usr.post('/login', passport.authenticate('local-login', {
 	successRedirect : '/todos',
