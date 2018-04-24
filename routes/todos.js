@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Todos = require('../models/todo');
-const {err_handler, async_wrapper} = require('/../helpers/helpers');
+const {err_handler, async_wrapper} = require('../helpers/helpers');
 const Td = express.Router();
 
 // Add the middle-ware function for the route
@@ -30,32 +30,38 @@ function hasAuth(req, res, next) {
 	}
 }
 
-Td.get('/app/todos', isLoggedIn, async_wrapper(async function(req, res, next){
+Td.get('/todos', isLoggedIn, async_wrapper(async function(req, res, next){
 	const todos = await Todos.find({}, err_handler);
 	res.status(200).json(todos);
 	res.end('Done');
 }));
 
-Td.post('/app/todos/:id', isLoggedIn, async_wrapper(async function(req, res, next){
+Td.post('/todos/:id', isLoggedIn, async_wrapper(async function(req, res, next){
 	var td = {task: req.body.task, isCompleted: req.body.isCompleted, creator: req.user};
-	await td.save(err_handler);
+	var td_s = new Todos(td);
+	await td_s.save(err_handler);
 	res.end('Done');
 }));
 
-Td.get('/app/todos/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
-	const todo = await Todos.findOne({req.params.id}, err_handler);
+Td.get('/todos/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
+	var _id = req.params.id;
+	const todo = await Todos.findOne({_id}, err_handler);
 	res.status(200).json(todo);
 	res.end('Done');
 }));
 
-Td.put('app/todo/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
+Td.put('/todo/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
 	var _id = req.params.id;
 	const todo_r = await Todos.findOneAndUpdate({_id}, req.body, {new: true}, err_handler);
 	res.status(200).json(todo_r);
 	res.end('Done');
 }));
 
-Td.delete('app/todo/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
-	await Todos.findOneAndRemove({req.params.id}, err_handler);
+Td.delete('/todo/:id', isLoggedIn, hasAuth, async_wrapper(async function(req, res, next){
+	var _id = req.params.id;
+	await Todos.findOneAndRemove({_id}, err_handler);
 	res.end('Done');
 }));
+
+
+module.exports = Td;
