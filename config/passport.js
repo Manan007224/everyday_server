@@ -1,5 +1,7 @@
 const User = require('../models/user');
 const LocalStrategy = require('passport-local').Strategy;
+const email_validator = require('email-validator'); 
+const empty = require('is-empty');
 
 module.exports = function(passport) {
 
@@ -33,6 +35,8 @@ module.exports = function(passport) {
 					return done(null);
 				}
 				else {
+					if((email_validator(email))===false || (empty(email))===false || (empty(password))===false)
+						return done(null, 'enter proper credentials');
 					var new_user = new User();
 					new_user.email = email;
 					new_user.password = new_user.generateHash(pwd);
@@ -57,18 +61,14 @@ module.exports = function(passport) {
 		function(req, email, pwd, done) {
 			User.findOne({'email': email}, function(err, user){
 				if(err) {
-					console.log(err);
 					return done(err);
 				}
 				if(!user) {
-					console.log('incorrect passowrd');
 					return done(null, false, {message: 'The user doesnt exist'});
 				}
 				if(!user.validPassword(pwd)) {
-					console.log('correct passowrd');
 					return done(null, false, {message: 'wrong password added'});
 				}
-				console.log('welcome finally');
 				return done(null, user);
 			});
 		}
